@@ -54,7 +54,7 @@ const AddMember = () => {
   const handleCancel = () => {
     navi("/app/members");
   };
-  const handleFetch = async (fetchId) => {
+  const handleFetch = async (fetchId: string) => {
     const fetch = await getoneMember(fetchId);
     console.log(fetch);
     setFirst_name(fetch?.first_name);

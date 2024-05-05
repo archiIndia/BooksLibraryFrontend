@@ -38,5 +38,14 @@ const deleteBook= async(delId: string)=> {
         throw error;
     }
 };
-
-export {createBooks, getallBooks, deleteBook};
+const getOneBook= async(fId: string)=> {
+  try{
+const response= await axios.get(`${baseURl}/${fId}`)
+return response.data;
+  }
+  catch(error){
+    console.log("can not Fetch",error);
+    throw error;
+}
+}
+export {createBooks, getallBooks, deleteBook, getOneBook};

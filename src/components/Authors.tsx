@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/table";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
-import { CirclePlus, Trash } from "lucide-react";
+import { CirclePlus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
 
 import {
@@ -98,7 +98,7 @@ const Authors = () => {
                     className={"h-8 w-8"}
                     onClick={()=> {handleDelete(author._id)}}
                   >
-                    <Trash className={"w-4 h-4 text-destructive"} />
+                    <Trash2 className={"w-6 h-10 text-destructive"} />
                   </Button>
                 </TableCell>
               </TableRow>

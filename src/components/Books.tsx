@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { CirclePlus, Pencil, Trash2 } from "lucide-react";
+import { CirclePlus,SquarePen, Trash2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table.tsx";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getallBooks } from "@/Services/Books.service";
+import { deleteBook, getallBooks } from "@/Services/Books.service";
 
 const Books = () => {
   const [books, setBooks] = useState([]);
@@ -21,6 +21,14 @@ const Books = () => {
     };
     loadBooks();
   }, []);
+  const handleDelete = async (delId: string) => {
+    await deleteBook(delId);
+    const tempArray = books.filter((book) => {
+      return book._id !== delId;
+    });
+    setBooks(tempArray);
+  };
+
 
   return (
     <div className={"h-full overflow-y-auto p-5"}>
@@ -55,9 +63,27 @@ const Books = () => {
                 <TableCell>{book.isbn}</TableCell>
                 <TableCell>{book.edition}</TableCell>
                 <TableCell>
-                  {book.authors.map(
+                  {book.author_list.map(
                     (auth) => `${auth.first_name} ${auth.last_name}`
                   ).join(', ')}
+                </TableCell>
+                <TableCell>
+                  <Link to={`/app/books/edit/${book._id}`}>
+                <Button
+                      size={"icon"}
+                      variant={"outline"}
+                      className={"h-8 w-8"}
+                    >
+                      <SquarePen className={"w-6 h-8 text-primary"} />
+                      </Button>
+                      </Link>
+                  <Button 
+                  size={"icon"}
+                      variant={"outline"}
+                      className={"h-8 w-8 ml-2"}
+                      onClick={()=> handleDelete(book._id)}>
+                        <Trash2 className="h-8 w-6 text-destructive" />
+                      </Button>
                 </TableCell>
               </TableRow>
             ))}

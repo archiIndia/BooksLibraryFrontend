@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button.tsx";
-import {CirclePlus, Eye, Pencil, Trash2, Undo2} from "lucide-react";
+import {CirclePlus, Eye, Trash2, Undo2} from "lucide-react";
 import {
   Table,
   TableBody,

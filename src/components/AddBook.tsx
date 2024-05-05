@@ -18,7 +18,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { createBooks } from "@/Services/Books.service";
+import { createBooks, getOneBook } from "@/Services/Books.service";
 import { useNavigate, useParams } from "react-router";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
@@ -47,6 +47,7 @@ const AddBook = () => {
   const [selectedAuthors, setSelectedAuthors] = useState([]);
   const [selectedKeywords, setSelectedKeywords] = useState([]);
   const navi = useNavigate();
+  const { bookId } = useParams();
   const { toast } = useToast();
 
   const handleSelectAuthor = (author) => {
@@ -61,8 +62,10 @@ const AddBook = () => {
         title,
         isbn,
         edition,
-        authorIds : selectedAuthors.map((ath)=> {return ath.value}),
-        keyWords : selectedKeywords,
+        authorIds: selectedAuthors.map((ath) => {
+          return ath.value;
+        }),
+        keyWords: selectedKeywords,
       };
       console.log(payload);
       await createBooks(payload);
@@ -81,12 +84,12 @@ const AddBook = () => {
   const handleCancel = () => {
     navi("/app/books");
   };
-  const handleClear =(index) => {
-    const clearAuthor= selectedAuthors.filter((del,ind)=> index !== ind );
+  const handleClear = (index) => {
+    const clearAuthor = selectedAuthors.filter((del, ind) => index !== ind);
     setSelectedAuthors(clearAuthor);
   };
-  const handleKeywordClear= (index) => {
-    const clearkeyword= selectedKeywords.filter((key,ind)=> index !== ind);
+  const handleKeywordClear = (index) => {
+    const clearkeyword = selectedKeywords.filter((key, ind) => index !== ind);
     setSelectedKeywords(clearkeyword);
   };
   useEffect(() => {
@@ -102,6 +105,20 @@ const AddBook = () => {
     };
     loadAuthors();
   }, []);
+  const handleFetch = async (fetchId) => {
+    const fetched = await getOneBook(fetchId);
+    setTitle(fetched.title);
+    setIsbn(fetched.isbn);
+    setEdition(fetched.edition);
+    // setAllAuthors(fetched.allAuthors);
+    // setSelectedAuthors(fetched.selectedAuthors);
+    // setSelectedKeywords(fetched.selectedKeywords);
+  };
+  useEffect(() => {
+    if (bookId) {
+      handleFetch(bookId);
+    }
+  }, [bookId]);
 
   return (
     <div className={"py-2 flex flex-col h-screen"}>
@@ -187,7 +204,9 @@ const AddBook = () => {
                         className={
                           "cursor-pointer w-4 h-4 ml-1 text-destructive/30 hover:text-destructive"
                         }
-                        onClick={()=> {handleClear(index)}}
+                        onClick={() => {
+                          handleClear(index);
+                        }}
                       />
                     </span>
                   </Badge>
@@ -244,7 +263,9 @@ const AddBook = () => {
                         className={
                           "cursor-pointer w-4 h-4 ml-1 text-destructive/30 hover:text-destructive"
                         }
-                        onClick={()=> {handleKeywordClear(index)}}
+                        onClick={() => {
+                          handleKeywordClear(index);
+                        }}
                       />
                     </span>
                   </Badge>
