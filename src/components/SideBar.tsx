@@ -21,7 +21,7 @@ const SideBar = () => {
             <div
               className={cn(
                 "h-10 flex items-center rounded px-2 w-full",
-                isActive ? "bg-cyan-600 text-primary-foreground" : "text-cyan-600"
+                isActive ? "bg-primary text-primary-foreground" : "text-primary"
               )}
             >
               <span className={"ml-2"}>Authors</span>
@@ -33,7 +33,7 @@ const SideBar = () => {
             <div
               className={cn(
                 "h-10 flex items-center rounded px-2 w-full",
-                isActive ? "bg-cyan-600 text-primary-foreground" : "text-cyan-600"
+                  isActive ? "bg-primary text-primary-foreground" : "text-primary"
               )}
             >
               <span className={"ml-2"}>Books</span>
@@ -45,7 +45,7 @@ const SideBar = () => {
             <div
               className={cn(
                 "h-10 flex items-center rounded px-2 w-full",
-                isActive ? "bg-cyan-600 text-primary-foreground" : "text-cyan-600"
+                  isActive ? "bg-primary text-primary-foreground" : "text-primary"
               )}
             >
               <span className={"ml-2"}>Members</span>
@@ -57,7 +57,7 @@ const SideBar = () => {
             <div
               className={cn(
                 "h-10 flex items-center rounded px-2 w-full",
-                isActive ? "bg-cyan-600 text-primary-foreground" : "text-cyan-600"
+                  isActive ? "bg-primary text-primary-foreground" : "text-primary"
               )}
             >
               <span className={"ml-2"}>Checkouts</span>
