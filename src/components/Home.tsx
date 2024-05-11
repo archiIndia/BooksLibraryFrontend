@@ -8,7 +8,7 @@ const Home = () => {
   return (
     <div
       className={
-        "fixed inset-0 flex flex-col p-10 bg-primary text-primary-foreground"
+        "fixed inset-0 flex flex-col p-10 bg-primary/60 text-primary-foreground"
       }
     >
       <div className={"flex items-center justify-between"}>
@@ -21,14 +21,14 @@ const Home = () => {
             <BookCopy className={"size-6 text-zinc-700"}/>
           </div>
           <div className={"flex flex-col ml-4"}>
-          <span className={"text-xl"}>Knowledge Hub</span>
+          <span className={"text-xl text-primary-foreground"}>Knowledge Hub</span>
           </div>
         </div>
 
         <div>
           {/*on this button click goes to the author page as it is a link to the author page*/}
           <Link to={"/app/authors"}>
-            <Button variant={"secondary"} className={"uppercase text-xs"}>
+            <Button variant={"secondary"} className={"uppercase text-xs text-zinc-800"}>
               Dashboard
             </Button>
           </Link>
@@ -37,7 +37,7 @@ const Home = () => {
 
       <div className={"grow flex flex-col justify-end"}>
         <blockquote className="space-y-2">
-          <p className="text-lg">
+          <p className="text-lg text-primary-foreground">
             “Knowledge Hub(K.H) is a Library Management Software.”
           </p>
           <footer className="text-sm">Reducer</footer>

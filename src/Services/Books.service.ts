@@ -47,5 +47,23 @@ return response.data;
     console.log("can not Fetch",error);
     throw error;
 }
+};
+const updateBook= async(bookId,bookData)=> {
+  try{
+const payload= {
+  title: bookData.title,
+  isbn: bookData.isbn,
+  edition: bookData.edition,
+  author_ids: bookData.authorIds,
+  keywords: bookData.keyWords,
 }
-export {createBooks, getallBooks, deleteBook, getOneBook};
+const response= await axios.put(`${baseURl}/${bookId}`,payload);
+return response.data;
+  }
+  catch(error){
+console.log("Can not Update", error);
+throw error;
+  }
+}
+
+export {createBooks, getallBooks, deleteBook, getOneBook, updateBook};

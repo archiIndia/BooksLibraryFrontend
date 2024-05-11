@@ -74,7 +74,7 @@ const Books = () => {
                       variant={"outline"}
                       className={"h-8 w-8"}
                     >
-                      <SquarePen className={"w-6 h-8 text-primary"} />
+                      <SquarePen className={"w-4 h-4 text-primary"} />
                       </Button>
                       </Link>
                   <Button 
@@ -82,7 +82,7 @@ const Books = () => {
                       variant={"outline"}
                       className={"h-8 w-8 ml-2"}
                       onClick={()=> handleDelete(book._id)}>
-                        <Trash2 className="h-8 w-6 text-destructive" />
+                        <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
                 </TableCell>
               </TableRow>

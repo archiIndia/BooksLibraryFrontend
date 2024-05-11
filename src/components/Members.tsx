@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button.tsx";
-import { CirclePlus, SquarePen, Trash2 } from "lucide-react";
+import { CirclePlus, Eye, Trash2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -98,7 +98,7 @@ const Members = () => {
                       variant={"outline"}
                       className={"h-8 w-8"}
                     >
-                      <SquarePen className={"w-4 h-4 text-primary"} />
+                      <Eye className={"w-4 h-4 text-primary"} />
                     </Button>
                   </Link>
                   <Button

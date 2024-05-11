@@ -18,7 +18,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { createBooks, getOneBook } from "@/Services/Books.service";
+import { createBooks, getOneBook, updateBook } from "@/Services/Books.service";
 import { useNavigate, useParams } from "react-router";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
@@ -37,6 +37,8 @@ const allKeywords = [
   "Fiction",
   "Historical",
   "Horror",
+  "Mythology",
+  "Science",
 ];
 
 const AddBook = () => {
@@ -49,6 +51,7 @@ const AddBook = () => {
   const navi = useNavigate();
   const { bookId } = useParams();
   const { toast } = useToast();
+  const isEdit = bookId !== undefined;
 
   const handleSelectAuthor = (author) => {
     setSelectedAuthors([...selectedAuthors, author]);
@@ -67,17 +70,24 @@ const AddBook = () => {
         }),
         keyWords: selectedKeywords,
       };
-      console.log(payload);
-      await createBooks(payload);
-      toast({
-        title: "Congratulation",
-        description: "Author is Added...",
-      });
+      if (isEdit) {
+        await updateBook(bookId, payload);
+        toast({
+          title: "Sucess",
+          description: "Book is Updated...",
+        });
+      } else {
+        await createBooks(payload);
+        toast({
+          title: "Congratulation",
+          description: "Book is Added...",
+        });
+      }
       navi("/app/books");
     } catch {
       toast({
         title: "Sorry",
-        description: "Author does not Added",
+        description: "Book does not Added",
       });
     }
   };
@@ -105,38 +115,46 @@ const AddBook = () => {
     };
     loadAuthors();
   }, []);
-  const handleFetch = async (fetchId) => {
-    const fetched = await getOneBook(fetchId);
-    setTitle(fetched.title);
-    setIsbn(fetched.isbn);
-    setEdition(fetched.edition);
-    // setAllAuthors(fetched.allAuthors);
-    // setSelectedAuthors(fetched.selectedAuthors);
-    // setSelectedKeywords(fetched.selectedKeywords);
-  };
+
   useEffect(() => {
-    if (bookId) {
-      handleFetch(bookId);
-    }
-  }, [bookId]);
+    const handleFetch = async () => {
+      const fetched = await getOneBook(bookId);
+      setTitle(fetched.title);
+      setIsbn(fetched.isbn);
+      setEdition(fetched.edition);
+      const mappedAuthors = fetched.author_list.map((author) => {
+        return {
+          label: `${author.first_name} ${author.last_name}`,
+          value: author._id,
+        };
+      });
+      setSelectedAuthors(mappedAuthors);
+      setSelectedKeywords(fetched.keywords);
+    };
+    if (!isEdit) return;
+    handleFetch().catch((error) => {
+      toast({
+        title: "Sorry",
+        description: error.mesage,
+      });
+      navi("/app/books");
+    });
+  }, [bookId, isEdit, toast, navi]);
 
   return (
     <div className={"py-2 flex flex-col h-screen"}>
-      {/*header*/}
       <div className={"flex justify-between shadow px-5 py-2"}>
-        <h1 className={"text-2xl text-primary"}>Add New Book</h1>
+        <h1 className={"text-2xl text-primary"}>{isEdit ? "Edit Book" : "Add New Book"}</h1>
         <div>
-          <Button variant={"outline"} className={"mr-3"} onClick={handleCancel}>
+          <Button variant={"outline"} className={"mr-3 hover:bg-red-500 hover:text-white"} onClick={handleCancel}>
             Cancel
           </Button>
-          <Button onClick={handleSave}>Save</Button>
+          <Button onClick={handleSave}>{!isEdit ? "Save" : "Update"}</Button>
         </div>
       </div>
 
-      {/*form body*/}
       <div className={"p-5 overflow-y-scroll grow"}>
         <div>
-          {/*book details*/}
           <div className={"flex gap-y-6 flex-col max-w-2xl py-5"}>
             <p className={"text-xl"}> Book details </p>
             <div className={"flex items-center"}>

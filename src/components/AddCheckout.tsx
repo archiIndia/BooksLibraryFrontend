@@ -15,7 +15,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command.tsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -24,46 +24,114 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table.tsx";
+import { getallBooks } from "@/Services/Books.service";
+import { DateTime } from "luxon";
+import { getallMembers } from "@/Services/Members.service";
+import { createCheckout } from "@/Services/Checkout.service";
+import {useNavigate} from "react-router-dom";
 
 const AddCheckout = () => {
-  const allMembers = [
-    {
-      label: "John Doe",
-      value: "1",
-    },
-
-    {
-      label: "Jane Doe",
-      value: "2",
-    },
-    {
-      label: "Rajesh",
-      value: "3",
-    },
-  ];
-  const allBooks = [
-    {
-      label: "Book 1",
-      value: "1",
-    },
-
-    {
-      label: "Book 2",
-      value: "2",
-    },
-    {
-      label: "Book 3",
-      value: "3",
-    },
-  ];
-
-  const [borrowedBooks] = useState([
+  const [allMembers, setAllMembers] = useState([]);
+  const [allBooks, setAllBooks] = useState([]);
+  const [selectedMembers, setSelectedMembers] = useState(null);
+  const [issue_date, setIssue_date] = useState(DateTime.now().toISO());
+  const [due_date, setDue_date] = useState(
+    DateTime.now().plus({ days: 7 }).toISO()
+  );
+  const navi = useNavigate();
+  const [borrowedBooks, setBorrowedBooks] = useState([
     {
       book_title: null,
       copies: 1,
       book_id: null,
     },
   ]);
+  useEffect(() => {
+    const loadAllBooks = async () => {
+      try {
+        const books = await getallBooks();
+        const books_mapped = books.map((book) => ({
+          label: book.title,
+          value: book._id,
+        }));
+        setAllBooks(books_mapped);
+      } catch (error) {
+        console.log(error.mesage);
+      }
+    };
+    const loadAllMembers = async () => {
+      try {
+        const members = await getallMembers();
+        const members_mapped = members.map((member) => ({
+          label: `${member.first_name} ${member.last_name}`,
+          value: member._id,
+        }));
+        setAllMembers(members_mapped);
+      } catch (error) {
+        console.log(error.mesage);
+      }
+    };
+    loadAllBooks().catch((error) => console.error(error));
+    loadAllMembers();
+  }, []);
+  const handleMemberChange = (m) => {
+    setSelectedMembers(m);
+  };
+  const handleIssueDate = (e) => {
+    setIssue_date(e.target.value);
+  };
+  const handleDueDate = (e) => {
+    setDue_date(e.target.value);
+  };
+  const handleBookChange = (index: number, book) => {
+    const newBooks = [...borrowedBooks];
+    newBooks[index] = {
+      book_title: book.label,
+      copies: 1,
+      book_id: book.value,
+    };
+    setBorrowedBooks(newBooks);
+  };
+  const handleCopiesChange = (index: number, ev) => {
+    const newBooks = [...borrowedBooks];
+    newBooks[index] = {
+      ...newBooks[index],
+      copies: ev.target.value,
+    };
+    setBorrowedBooks(newBooks);
+  };
+  const handleRemoveBook = (index: number) => {
+    if (borrowedBooks.length === 1) {
+      return;
+    }
+    const newBooks = borrowedBooks.filter((_, i) => i !== index);
+    setBorrowedBooks(newBooks);
+  };
+  const handleAddMore = () => {
+    setBorrowedBooks([
+      ...borrowedBooks,
+      {
+        book_title: null,
+        copies: 1,
+        book_id: null,
+      },
+    ]);
+  };
+  const handleCancel= ()=> {
+    navi("/app/checkouts")
+  };
+  const handleSave = async () => {
+    const payload = {
+      member_id: selectedMembers.value,
+      issue_date: issue_date,
+      due_date: due_date,
+      book_list: borrowedBooks.map((book) => ({
+        book_id: book.book_id,
+        copies: book.copies,
+      })),
+    };
+    await createCheckout(payload);
+  };
 
   return (
     <div className={"py-2 flex flex-col h-screen"}>
@@ -71,10 +139,10 @@ const AddCheckout = () => {
       <div className={"flex justify-between shadow px-5 py-2"}>
         <h1 className={"text-2xl text-primary"}>New Checkout</h1>
         <div>
-          <Button variant={"outline"} className={"mr-3"}>
+          <Button variant={"outline"} className={"mr-3 hover:text-white hover:bg-red-600"} onClick={handleCancel}>
             Cancel
           </Button>
-          <Button>Save</Button>
+          <Button onClick={() => handleSave()}>Save</Button>
         </div>
       </div>
 
@@ -96,16 +164,20 @@ const AddCheckout = () => {
                     role="combobox"
                     className={"px-2 py-1 border rounded w-1/2 justify-between"}
                   >
-                    {"Select Member"}
+                    {selectedMembers?.label ??"Selected Member"}
                     <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className={"p-0"} align={"start"}>
                   <Command>
                     <CommandList>
-                      <CommandInput placeholder="Search Authors..." />
+                      <CommandInput placeholder="Search Members..." />
                       {[...allMembers].map((member) => (
-                        <CommandItem key={member.value} value={member.label}>
+                        <CommandItem
+                          key={member.value}
+                          value={member.label}
+                          onSelect={() => handleMemberChange(member)}
+                        >
                           {member.label}
                         </CommandItem>
                       ))}
@@ -122,6 +194,8 @@ const AddCheckout = () => {
                 type="date"
                 id="issue_date"
                 className={"px-2 py-1 border rounded w-1/2"}
+                value={DateTime.fromISO(issue_date).toFormat("yyyy-MM-dd")}
+                onChange={handleIssueDate}
               />
             </div>
             <div className={"flex items-center"}>
@@ -132,8 +206,21 @@ const AddCheckout = () => {
                 type="date"
                 id="due_date"
                 className={"px-2 py-1 border rounded w-1/2"}
+                value={DateTime.fromISO(due_date).toFormat("yyyy-MM-dd")}
+                onChange={handleDueDate}
               />
-              <Badge className={"ml-2 h-9 rounded-md"}>10 Days</Badge>
+              <Badge className={"ml-2 h-9 rounded-md"}>
+              {
+                  DateTime.fromISO(due_date)
+                    .diff(DateTime.fromISO(issue_date), [
+                      "days",
+                      "hours",
+                      "minutes",
+                    ])
+                    .toObject().days
+                }{" "}
+                Days
+              </Badge>
             </div>
           </div>
           <Separator className={"my-6"} />
@@ -173,7 +260,7 @@ const AddCheckout = () => {
                               <CommandList>
                                 <CommandInput placeholder="Search Authors..." />
                                 {[...allBooks].map((b) => (
-                                  <CommandItem key={b.value} value={b.label}>
+                                  <CommandItem key={b.value} value={b.label} onSelect={()=> handleBookChange(index,b)}>
                                     {b.label}
                                   </CommandItem>
                                 ))}
@@ -187,10 +274,11 @@ const AddCheckout = () => {
                           type="number"
                           className={"px-2 py-1 border rounded w-1/2"}
                           value={book.copies}
+                          onChange={(e)=> handleCopiesChange(index,e)}
                         />
                       </TableCell>
                       <TableCell className={"flex justify-end"}>
-                        <Button variant={"outline"} size={"icon"}>
+                        <Button variant={"outline"} size={"icon"} onClick={()=> handleRemoveBook(index)}>
                           <Trash2 className={"w-4 h-4 text-destructive"} />
                         </Button>
                       </TableCell>
@@ -199,7 +287,7 @@ const AddCheckout = () => {
                 </TableBody>
               </Table>
               <div className={"mt-2"}>
-                <Button>
+                <Button onClick={handleAddMore}>
                   <Plus className={"w-4 h-4"} />
                   Add More
                 </Button>

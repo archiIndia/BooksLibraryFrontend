@@ -13,7 +13,6 @@ import { Separator } from "@/components/ui/separator.tsx";
 import { useEffect, useState } from "react";
 import { createMembers, getoneMember } from "@/Services/Members.service";
 import { useNavigate, useParams } from "react-router";
-import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
 import { DateTime } from "luxon";
 
@@ -29,6 +28,7 @@ const AddMember = () => {
   const navi = useNavigate();
   const { toast } = useToast();
   const { memberId } = useParams();
+  const isEdit = memberId !== undefined;
 
   const handleSaveMember = async () => {
     try {
@@ -76,12 +76,12 @@ const AddMember = () => {
     <div className={"py-2 flex flex-col h-screen"}>
       {/*header*/}
       <div className={"flex justify-between shadow px-5 py-2"}>
-        <h1 className={"text-2xl text-primary"}>Add New Member</h1>
+        <h1 className={"text-2xl text-primary"}>{!isEdit? "Add New Member" : "Member" }</h1>
         <div>
-          <Button variant={"outline"} className={"mr-3"} onClick={handleCancel}>
-            Cancel
+          <Button variant={"outline"} className={"mr-3 hover:bg-red-500 hover:text-white"} onClick={handleCancel}>
+            {isEdit ? "Back" : "Cancel"}
           </Button>
-          <Button onClick={handleSaveMember}>Save</Button>
+          {!isEdit ? <Button onClick={handleSaveMember}>Save</Button> : ""}
         </div>
       </div>
 
@@ -216,7 +216,6 @@ const AddMember = () => {
                   setJoin_date(ev.target.value);
                 }}
               />
-              <Toaster />
             </div>
           </div>
         </div>

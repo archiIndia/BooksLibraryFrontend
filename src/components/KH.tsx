@@ -1,5 +1,6 @@
 import SideBar from "@/components/SideBar.tsx";
 import { Outlet } from "react-router-dom";
+import { Toaster } from "@/components/ui/toaster";
 
 const KH = () => {
   return (
@@ -11,6 +12,7 @@ const KH = () => {
       <SideBar />
       <div className={" grow"}>
         <Outlet />
+        <Toaster />
       </div>
     </div>
   );

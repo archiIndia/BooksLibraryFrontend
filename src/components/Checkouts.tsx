@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button.tsx";
-import {CirclePlus, Eye, Trash2, Undo2} from "lucide-react";
+import { CirclePlus, Eye, Trash2, Undo2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -9,47 +9,19 @@ import {
   TableRow,
 } from "@/components/ui/table.tsx";
 import { Link } from "react-router-dom";
-import { Badge } from "@/components/ui/badge.tsx";
 import { DateTime } from "luxon";
+import { useEffect, useState } from "react";
+import { getAllCheckouts } from "@/Services/Checkout.service";
 
 const Checkouts = () => {
-  const allCheckouts = [
-    {
-      _id: "1",
-      member_details: {
-        first_name: "John",
-        last_name: "Doe",
-        _id: "1",
-      },
-      book_details: {
-        name: "Book 1",
-        _id: "1",
-      },
-      issue_date: new Date("2021-12-25"),
-      borrowed_for: 7,
-      due_date: new Date("2022-01-01"),
-      has_return: false,
-      over_day: 0,
-    },
-    {
-      _id: "2",
-      // another member
-      member_details: {
-        first_name: "Jane",
-        last_name: "Doe",
-        _id: "2",
-      },
-      book_details: {
-        name: "Book 2",
-        _id: "2",
-      },
-      issue_date: new Date("2021-12-25"),
-      borrowed_for: 7,
-      due_date: new Date("2022-01-01"),
-      has_return: false,
-      over_day: 0,
-    },
-  ];
+  const [checkouts, setCheckouts] = useState([]);
+  useEffect(()=> {
+    const loadAllCheckouts= async() => {
+      const data = await getAllCheckouts();
+      setCheckouts([...data]);
+    };
+    loadAllCheckouts();
+  },[]);
 
   return (
     <div className={"h-full overflow-y-auto p-5"}>
@@ -81,7 +53,7 @@ const Checkouts = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {allCheckouts.map((chk, index) => (
+            {checkouts.map((chk, index) => (
               <TableRow key={index}>
                 <TableCell className="font-medium">
                   {DateTime.fromJSDate(chk.issue_date).toFormat("dd-MM-yyyy")}
@@ -95,11 +67,6 @@ const Checkouts = () => {
                   {DateTime.fromJSDate(chk.due_date).toFormat("dd-MM-yyyy")}
                 </TableCell>
                 <TableCell>{chk.has_return ? "Yes" : "No"}</TableCell>
-                <TableCell>
-                  <Badge className={"bg-red-200 text-red-600 hover:bg-red-300"}>
-                    {chk.over_day}
-                  </Badge>
-                </TableCell>
                 <TableCell className={"flex justify-end"}>
                   <Link to={`/app/checkouts/edit/${chk._id}`}>
                     <Button

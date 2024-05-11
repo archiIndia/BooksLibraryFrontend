@@ -95,10 +95,10 @@ const Authors = () => {
                   <Button
                     size={"icon"}
                     variant={"outline"}
-                    className={"h-8 w-8"}
+                    className={"h-8 w-8 ml-2"}
                     onClick={()=> {handleDelete(author._id)}}
                   >
-                    <Trash2 className={"w-6 h-10 text-destructive"} />
+                    <Trash2 className={"w-4 h-6 text-destructive"} />
                   </Button>
                 </TableCell>
               </TableRow>
