@@ -11,17 +11,38 @@ import {
 import { Link } from "react-router-dom";
 import { DateTime } from "luxon";
 import { useEffect, useState } from "react";
-import { getAllCheckouts } from "@/Services/Checkout.service";
+import { deleteCheckouts, getAllCheckouts, returnCheckout } from "@/Services/Checkout.service";
 
 const Checkouts = () => {
   const [checkouts, setCheckouts] = useState([]);
-  useEffect(()=> {
-    const loadAllCheckouts= async() => {
+  useEffect(() => {
+    const loadAllCheckouts = async () => {
       const data = await getAllCheckouts();
       setCheckouts([...data]);
     };
     loadAllCheckouts();
-  },[]);
+  }, []);
+  const handleDelete = async (delId: string) => {
+    try{
+    await deleteCheckouts(delId);
+    const tempArray = checkouts.filter((checkout) => checkout._id !== delId);
+    setCheckouts(tempArray);
+    }catch(err){
+      alert(err.message);
+    }
+  };
+  const handleReturn = async(rId: string)=> {
+    try{
+      await returnCheckout(rId);
+      const index= checkouts.findIndex((checkout)=> checkout._id === rId);
+     const tempArray=[...checkouts];
+    tempArray[index].has_return = true;
+    setCheckouts(tempArray);
+    }
+    catch(err){
+      alert("Can not returned..."+err.message);
+    }
+  }
 
   return (
     <div className={"h-full overflow-y-auto p-5"}>
@@ -45,10 +66,8 @@ const Checkouts = () => {
               <TableHead className="w-[200px]">Date</TableHead>
               <TableHead>Member name</TableHead>
               <TableHead>Book name</TableHead>
-              <TableHead>Borrowed for</TableHead>
               <TableHead>Due date</TableHead>
               <TableHead>Has return</TableHead>
-              <TableHead>Over day</TableHead>
               <TableHead>&nbsp;</TableHead>
             </TableRow>
           </TableHeader>
@@ -56,15 +75,16 @@ const Checkouts = () => {
             {checkouts.map((chk, index) => (
               <TableRow key={index}>
                 <TableCell className="font-medium">
-                  {DateTime.fromJSDate(chk.issue_date).toFormat("dd-MM-yyyy")}
+                  {DateTime.fromISO(chk.issue_date).toFormat("dd-MM-yyyy")}
                 </TableCell>
                 <TableCell>
                   {chk.member_details.first_name} {chk.member_details.last_name}
                 </TableCell>
-                <TableCell>{chk.book_details.name}</TableCell>
-                <TableCell>{chk.borrowed_for} days</TableCell>
                 <TableCell>
-                  {DateTime.fromJSDate(chk.due_date).toFormat("dd-MM-yyyy")}
+                  {chk.book_list.map((b) => b.book_details.title).join(", ")}
+                </TableCell>
+                <TableCell>
+                  {DateTime.fromISO(chk.due_date).toFormat("dd-MM-yyyy")}
                 </TableCell>
                 <TableCell>{chk.has_return ? "Yes" : "No"}</TableCell>
                 <TableCell className={"flex justify-end"}>
@@ -81,6 +101,7 @@ const Checkouts = () => {
                     size={"icon"}
                     variant={"outline"}
                     className={"h-8 w-8 ml-2"}
+                    onClick={()=> handleReturn(chk._id)}
                   >
                     <Undo2 className={"w-4 h-4 text-primary"} />
                   </Button>
@@ -89,6 +110,7 @@ const Checkouts = () => {
                     size={"icon"}
                     variant={"outline"}
                     className={"h-8 w-8 ml-2"}
+                    onClick={() => handleDelete(chk._id)}
                   >
                     <Trash2 className={"w-4 h-4 text-red-500"} />
                   </Button>

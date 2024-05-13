@@ -20,4 +20,25 @@ const getAllCheckouts = async () => {
     throw error;
   }
 };
-export { createCheckout, getAllCheckouts };
+const deleteCheckouts= async(delId: string)=> {
+try{
+const response= await axios.delete(`${baseURL}/${delId}`);
+return response.data;
+}
+catch(error){
+console.log("Can not deleted...", error);
+throw error;
+}
+};
+const returnCheckout= async(rId: string)=> {
+  try{
+const response= await axios.put(`${baseURL}/${rId}/return`);
+return response.data;
+  }
+  catch(error){
+console.log("Can not Occured...", error);
+throw error;
+  }
+};
+
+export { createCheckout, getAllCheckouts, deleteCheckouts, returnCheckout };
